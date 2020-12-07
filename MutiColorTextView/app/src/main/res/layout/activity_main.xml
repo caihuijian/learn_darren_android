@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:chjApp="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:padding="16dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <com.example.chj.muticolortextview.MultiColorTextView
+        android:id="@+id/multi_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#ccc"
+        chjApp:originColor="#000"
+        chjApp:changeColor="@color/colorAccent"
+        android:textSize="20sp"
+        android:text="Hello World!"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="leftToRight"
+        android:onClick="leftToRight"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="rightToLeft"
+        android:onClick="rightToLeft"/>
+
+</LinearLayout>

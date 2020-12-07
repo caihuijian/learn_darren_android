@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- step1 定义组定义属性 -->
+    <declare-styleable name="MultiColorTextView">
+        <attr name="originColor" format="color"/>
+        <attr name="changeColor" format="color"/>
+    </declare-styleable>
+</resources>
