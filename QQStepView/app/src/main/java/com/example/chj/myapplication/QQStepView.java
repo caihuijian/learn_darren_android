@@ -105,7 +105,8 @@ public class QQStepView extends View {
 
         //计算文字绘制的baseline
         Paint.FontMetricsInt fontMetricsInt = mTextPaint.getFontMetricsInt();
-        int baseLine = Math.abs((fontMetricsInt.bottom - fontMetricsInt.top - getHeight()) / 2 + fontMetricsInt.top);
+        //int baseLine = Math.abs((fontMetricsInt.bottom - fontMetricsInt.top - getHeight()) / 2 + fontMetricsInt.top);
+        int baseLine = getHeight() / 2 - fontMetricsInt.bottom / 2 - fontMetricsInt.top / 2;
 
         //使用方法drawText(@NonNull String text, float x, float y, @NonNull Paint paint)
         //含义 文本 左边的绘制起始点 baseline 画笔
