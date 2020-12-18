@@ -1,1 +1,1 @@
-include ':app', ':customratingbar'
+include ':app', ':customratingbar', ':lettersidebar', ':taglayout'
