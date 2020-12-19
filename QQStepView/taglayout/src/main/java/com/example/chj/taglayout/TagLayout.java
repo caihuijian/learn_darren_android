@@ -5,6 +5,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -128,15 +129,21 @@ public class TagLayout extends ViewGroup {
     }
 
 
-    public void setAdapter(TagLayoutAdapter adapter) {
+    public void setAdapter(final TagLayoutAdapter adapter) {
         if (adapter == null) {
             throw new NullPointerException("TagLayoutAdapter must not null!!");
         }
         removeAllViews();
-        TagLayoutAdapter mAdapter;
-        mAdapter = adapter;
-        for (int i = 0; i < mAdapter.getCount(); i++) {
-            addView(mAdapter.getViewAtPosition(i, this));
+
+        for (int i = 0; i < adapter.getCount(); i++) {
+            final TextView textView = (TextView) adapter.getViewAtPosition(i, this);
+            addView(textView);
+            textView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    adapter.itemClick(textView.getText().toString());
+                }
+            });
         }
     }
 
@@ -144,5 +151,7 @@ public class TagLayout extends ViewGroup {
         abstract int getCount();
 
         abstract View getViewAtPosition(int index, ViewGroup parent);
+
+        abstract void itemClick(String s);
     }
 }

@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,6 +77,11 @@ public class MainActivity extends AppCompatActivity {
                 TextView textView = (TextView) inflater.inflate(R.layout.tag_view_items, parent, false);
                 textView.setText(stringOfViews.get(index));
                 return textView;
+            }
+
+            @Override
+            void itemClick(String textString) {
+                Toast.makeText(MainActivity.this, textString, Toast.LENGTH_SHORT).show();
             }
 
             @Override
