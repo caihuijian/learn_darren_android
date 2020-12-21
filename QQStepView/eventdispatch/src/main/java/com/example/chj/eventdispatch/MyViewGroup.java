@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 public class MyViewGroup extends LinearLayout {
-    private static final String TAG = "CHJ123";
+    private static final String TAG = "MyViewGroup";
 
     public MyViewGroup(Context context) {
         super(context);

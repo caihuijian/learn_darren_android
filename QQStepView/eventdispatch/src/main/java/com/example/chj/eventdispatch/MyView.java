@@ -8,7 +8,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 public class MyView extends View {
-    private static final String TAG = "CHJ123";
+    private static final String TAG = "MyView";
 
     public MyView(Context context) {
         this(context, null);
