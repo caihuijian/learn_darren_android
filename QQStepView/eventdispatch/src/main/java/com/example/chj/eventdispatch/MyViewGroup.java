@@ -39,14 +39,4 @@ public class MyViewGroup extends LinearLayout {
         Log.d(TAG, "onInterceptTouchEvent:" + ev.getAction());
         return super.onInterceptTouchEvent(ev);
     }
-
-//    @Override
-//    protected void onLayout(boolean changed, int l, int t, int r, int b) {
-//        measureChildren(MeasureSpec.AT_MOST,MeasureSpec.AT_MOST);
-//        int childCount = getChildCount();
-//        for (int i = 0; i < childCount; i++) {
-//            getChildAt(i).layout(0, 0, getChildAt(i).getMeasuredWidth(),getChildAt(i).getMeasuredHeight());
-//        }
-//
-//    }
 }
