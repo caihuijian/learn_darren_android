@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.example.chj.kgslidingmenu.KGSlidingMenu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:menuGap="@dimen/menu_gap"
+    tools:context=".MainActivity">
+    <!-- LinearLayout布局应该只有两个子节点 -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <include layout="@layout/layout_menu" />
+
+        <include layout="@layout/layout_main_content" />
+    </LinearLayout>
+
+
+</com.example.chj.kgslidingmenu.KGSlidingMenu>

@@ -1,1 +1,1 @@
-include ':app', ':customratingbar', ':lettersidebar', ':taglayout', ':eventdispatch'
+include ':app', ':customratingbar', ':lettersidebar', ':taglayout', ':eventdispatch', ':kgslidingmenu'
