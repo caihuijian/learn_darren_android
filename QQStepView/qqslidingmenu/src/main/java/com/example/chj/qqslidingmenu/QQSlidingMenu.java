@@ -17,6 +17,7 @@ public class QQSlidingMenu extends HorizontalScrollView {//普通ScrollView是�
     private int mMenuWidth;//菜单宽度=屏幕宽度-空白gap的宽度
     private ViewGroup mMenu;
     private ViewGroup mContent;
+    private View mShadowView;
     private boolean isMenuOpen = false;
     private boolean isIntercept = false;
     //手势处理类 使用这个类需要
@@ -72,6 +73,8 @@ public class QQSlidingMenu extends HorizontalScrollView {//普通ScrollView是�
         if (container.getChildCount() != 2) {
             throw new RuntimeException("KGSlidingMenu子节点的子view必须是2个！！");
         }
+        mShadowView = container.findViewById(R.id.shadowView);
+        mShadowView.setAlpha(0f);
         //获得menu节点并指宽度
         mMenu = (ViewGroup) container.getChildAt(0);
         ViewGroup.LayoutParams tempLayoutParams = mMenu.getLayoutParams();
@@ -158,10 +161,10 @@ public class QQSlidingMenu extends HorizontalScrollView {//普通ScrollView是�
     @Override
     protected void onScrollChanged(int l, int t, int oldl, int oldt) {//想象不了alpha值如何计算 就打印log然后思考逻辑
         super.onScrollChanged(l, t, oldl, oldt);
-//        //在滑动onScroll的同时调用setTranslationX 让view看起来好像没有滑动 以达到抽屉效果
-//        //比如手指向左滑动 view整体向左滑动 但是view又调用了setTranslationX向右转移 看起来好像没有移动
-//        //这看起来像在一个矩形容器中心放一个球，这时容器向左移动，同时球以相同的速度向右移动，那么球在空间的绝对位置不变 看起来球好像没有移动
-//        mMenu.setTranslationX(l * 0.8f);
+        //在滑动onScroll的同时调用setTranslationX 让view看起来好像没有滑动 以达到抽屉效果
+        //比如手指向左滑动 view整体向左滑动 但是view又调用了setTranslationX向右转移 看起来好像没有移动
+        //这看起来像在一个矩形容器中心放一个球，这时容器向左移动，同时球以相同的速度向右移动，那么球在空间的绝对位置不变 看起来球好像没有移动
+        mMenu.setTranslationX(l * 0.8f);
 //
 //        //根据滑动x的距离调整左侧菜单的透明度
 //        float minAlpha = 0.3f;
@@ -180,6 +183,10 @@ public class QQSlidingMenu extends HorizontalScrollView {//普通ScrollView是�
 //        mContent.setPivotY(ScreenUtil.getScreenHeight(mContent.getContext())/2);
 //        mContent.setScaleX(currentContentScale);
 //        mContent.setScaleY(currentContentScale);
+
+        float minAlpha = 0f;
+        float shadowAlpha = (mMenuWidth - l) / (float) mMenuWidth * (1 - minAlpha) + minAlpha;
+        mShadowView.setAlpha(shadowAlpha);
     }
 
     private void closeMenu() {
