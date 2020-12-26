@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="QQSlidingMenu">
+        <!-- menu右侧的空白距离 -->
+        <attr name="menuGap" format="dimension" />
+    </declare-styleable>
+</resources>
