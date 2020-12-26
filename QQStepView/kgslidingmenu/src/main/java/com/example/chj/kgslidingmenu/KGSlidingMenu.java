@@ -177,8 +177,9 @@ public class KGSlidingMenu extends HorizontalScrollView {//普通ScrollView是�
         //根据滑动x的距离判断右侧内容缩放的大小 算法和透明度类似
         float minScale = 0.8f;
         float currentContentScale = l / (float) mMenuWidth * (1 - minScale) + minScale;
-        //缩放api默认以view的正中心为支点进行缩放 将缩放中心点移动到view的左侧中间位置
+        //缩放api默认以view的正中心为支点进行缩放(不同的API level似乎不一样) 因此自己设置才是保险的 将缩放中心点移动到view的左侧中间位置
         mContent.setPivotX(0);
+        mContent.setPivotY(ScreenUtil.getScreenHeight(mContent.getContext()) / 2);
         mContent.setScaleX(currentContentScale);
         mContent.setScaleY(currentContentScale);
     }
