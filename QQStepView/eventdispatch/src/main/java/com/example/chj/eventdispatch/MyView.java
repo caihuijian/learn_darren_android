@@ -34,6 +34,7 @@ public class MyView extends View {
                 return false;
             }
         });
+
     }
 
     @Override
