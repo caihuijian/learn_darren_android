@@ -141,8 +141,10 @@ public class KGSlidingMenu extends HorizontalScrollView {//普通ScrollView是�
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         super.onLayout(changed, l, t, r, b);
-        //TODO 为什么要判断changed
-        scrollTo(mMenuWidth, 0);
+        //判断changed 避免无效调用
+        if (changed) {
+            scrollTo(mMenuWidth, 0);
+        }
     }
 
     /**
