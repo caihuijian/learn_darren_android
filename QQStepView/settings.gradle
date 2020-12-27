@@ -1,1 +1,2 @@
 include ':app', ':customratingbar', ':lettersidebar', ':taglayout', ':eventdispatch', ':kgslidingmenu'
+include ':draglistview'
