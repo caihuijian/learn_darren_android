@@ -3,19 +3,20 @@ package com.example.chj.draglistview;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.ViewDragHelper;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 
 public class DragView extends FrameLayout {
     private ViewDragHelper mViewDragHelper;
     private ViewGroup frontView, behindView;
-    private boolean isFolded = true;
+    private boolean isMenuOpen = false;
 
     public DragView(@NonNull Context context) {
         this(context, null);
@@ -92,12 +93,12 @@ public class DragView extends FrameLayout {
             //2选1 要么全露出后面的view 要么全遮住后面的view
             //需要结合computeScroll使用 两个都要调用刷新
             if (releasedChild.getTop() < behindView.getMeasuredHeight() / 2) {
-                //全遮住后面的view 展开态
-                isFolded = false;
+                //全遮住后面的view 折叠态 菜单关闭
+                isMenuOpen = false;
                 mViewDragHelper.settleCapturedViewAt(0, 0);
             } else {
-                //全露出后面的view 折叠态
-                isFolded = true;
+                //全露出后面的view 展开态 菜单打开
+                isMenuOpen = true;
                 mViewDragHelper.settleCapturedViewAt(0, behindView.getMeasuredHeight());
             }
             invalidate();
@@ -125,28 +126,46 @@ public class DragView extends FrameLayout {
     //DragView.onInterceptTouchEvent().MOVE->DragView.onTouchEvent().MOVE
     //DragView的onTouchEvent缺失了down的处理部分 mViewDragHelper.processTouchEvent(event);也就缺失了down事件
     //事件不完整
-    float downY = 0f;
+    float mDownY = 0f;
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
-        //展开态拦截？
-//        if (!isFolded){
-//            return true;
-//        }
-        boolean isMovingDown = false;
-        switch (ev.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                downY = ev.getY();
-                mViewDragHelper.processTouchEvent(ev);//确保事件完整
-            case MotionEvent.ACTION_MOVE:
-                Log.d("TAG", "onInterceptTouchEvent: ACTION_MOVE" + ev.getY());
-                isMovingDown = ev.getY() > downY;//向下滑动
-//                return isMovingDown;
-        }
-        Log.d("TAG", "onInterceptTouchEvent: " + ev.getY());
-        if (isFolded && isMovingDown) {
+        if (isMenuOpen) {
             return true;
         }
+        switch (ev.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                //让mViewDragHelper获取完整事件 否则mViewDragHelper会丢弃整个事件（只得到move事件不处理）
+                mViewDragHelper.processTouchEvent(ev);
+                mDownY = ev.getY();
+                break;
+            case MotionEvent.ACTION_MOVE:
+                float moveY = ev.getY();
+                if (moveY > mDownY && !canChildScrollUp()) {//如果是向下滑动&&listView内部不能向下滚动 拦截事件
+                    return true;
+                }
+                break;
+        }
         return super.onInterceptTouchEvent(ev);
+    }
+
+    /**
+     * @return Whether it is possible for the child view of this layout to
+     * scroll up. Override this if the child view is a custom view.
+     * 判断View是否滚动到了最顶部,还能不能向上滚
+     */
+    public boolean canChildScrollUp() {
+        if (android.os.Build.VERSION.SDK_INT < 14) {
+            if (frontView instanceof AbsListView) {
+                final AbsListView absListView = (AbsListView) frontView;
+                return absListView.getChildCount() > 0
+                        && (absListView.getFirstVisiblePosition() > 0 || absListView.getChildAt(0)
+                        .getTop() < absListView.getPaddingTop());
+            } else {
+                return ViewCompat.canScrollVertically(frontView, -1) || frontView.getScrollY() > 0;
+            }
+        } else {
+            return frontView.canScrollVertically(-1);
+        }
     }
 }
