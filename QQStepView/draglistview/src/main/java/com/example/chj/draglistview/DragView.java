@@ -130,6 +130,7 @@ public class DragView extends FrameLayout {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
+        //菜单打开（展开态-非折叠态）父容器拦截所有事件 listView不应该自己处理事件
         if (isMenuOpen) {
             return true;
         }
@@ -141,7 +142,8 @@ public class DragView extends FrameLayout {
                 break;
             case MotionEvent.ACTION_MOVE:
                 float moveY = ev.getY();
-                if (moveY > mDownY && !canChildScrollUp()) {//如果是向下滑动&&listView内部不能向下滚动 拦截事件
+                //菜单关闭 （折叠态）并且是向下滑动 并且listView内部不能向下滚动 父容器拦截所有事件 listView不应该自己处理事件
+                if (moveY > mDownY && !canChildScrollUp()) {
                     return true;
                 }
                 break;
