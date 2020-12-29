@@ -6,8 +6,9 @@
     tools:context=".MainActivity">
 
     <com.example.lockpatternview.LockPatternView
+        android:id="@+id/lockPattern"
         android:layout_centerInParent="true"
-        android:background="#000"
+        android:background="#ccc"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 </RelativeLayout>
