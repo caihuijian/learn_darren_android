@@ -1,17 +1,13 @@
 package com.example.lockpatternview;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -23,9 +19,10 @@ public class LockPatternView extends View {
     private Paint mPaintNormal, mPaintPressed, mPaintError;//这里就不搞那么多画笔了 内外圈一样的颜色
     private int mRadiusOut, mRadiusInner;
     private ArrayList<Point> mPressedPoints = new ArrayList<>();
-    private String mPassWord = "";
-    private boolean mNeedIntercept = false;
     private PassListener mPassListener;
+    private float mFingerX = -1;
+    private float mFingerY = -1;
+    private boolean mNeedIntercept = false;
 
     public LockPatternView(Context context) {
         super(context);
@@ -101,13 +98,14 @@ public class LockPatternView extends View {
             double dx = mRadiusInner / centerDistance * x;
             //int dy =  radius/两圆心距离*y
             double dy = mRadiusInner / centerDistance * y;
+            if (mPressedPoints.get(i).status == PointStatus.NORMAL) {
+                return;
+            }
             canvas.drawLine((float) (mPressedPoints.get(i - 1).positionX - dx), (float) (mPressedPoints.get(i - 1).positionY - dy), (float) (mPressedPoints.get(i).positionX + dx), (float) (mPressedPoints.get(i).positionY + dy),
                     mPressedPoints.get(i).status == PointStatus.PRESSED ? mPaintPressed : mPaintError);
         }
     }
 
-    private float mFingerX = -1;
-    private float mFingerY = -1;
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -126,66 +124,57 @@ public class LockPatternView extends View {
                 traversingCheckInPoints(mFingerX, mFingerY);
                 break;
             case MotionEvent.ACTION_UP:
+                mNeedIntercept = true;
                 mFingerX = -1;
                 mFingerY = -1;
-                checkPassWord();
-                StringBuffer passBuffer = new StringBuffer();//拼凑密码
+                //checkPassWord(); 检查密码应该交由外部比较
+                StringBuilder passBuffer = new StringBuilder();//拼凑密码
                 for (Point point : mPressedPoints) {
                     passBuffer.append(point.index);
                 }
                 mPassListener.notifyPass(passBuffer.toString());
+                //抬起手指后两秒无法操作
+
+                postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mNeedIntercept = false;
+                    }
+                }, 2000);
                 break;
         }
         invalidate();
         return super.onTouchEvent(event);
     }
 
-    private void checkPassWord() {
-        mNeedIntercept = true;
-        clearStatusDelay(2000);
-        //如果密码太短 弹出提示 并将所有点状态跟新为error 设置屏幕无法触碰 两秒后清空状态
-        if (mPressedPoints.size() <= 4) {
-            Toast.makeText(getContext(), "密码太短！", Toast.LENGTH_SHORT).show();
-            for (Point point : mPressedPoints) {
-                point.setStatus(PointStatus.ERROR);
-            }
-
-            return;
-        }
-
-        StringBuffer passBuffer = new StringBuffer();//拼凑密码
-        for (Point point : mPressedPoints) {
-            passBuffer.append(point.index);
-        }
-        //如果密码正确 弹出提示 设置屏幕无法触碰 两秒之后清空状态
-        Log.d("TAG", "checkPassWord: mPassWord " + mPassWord + " passBuffer " + passBuffer);
-        if (passBuffer.toString().equals(mPassWord)) {
-            Toast.makeText(getContext(), "密码正确！", Toast.LENGTH_SHORT).show();
-        } else {//如果密码错误 弹出提示 并将所有点状态跟新为error 设置屏幕无法触碰 两秒后清空状态
-            Toast.makeText(getContext(), "密码错误！", Toast.LENGTH_SHORT).show();
-            for (Point point : mPressedPoints) {
-                point.setStatus(PointStatus.ERROR);
-            }
-        }
-
-
-    }
-
-    private void clearStatusDelay(int delayMilliseconds) {
-        postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mPressedPoints.clear();
-                for (Point[] pointArr : mPoints) {
-                    for (Point point : pointArr) {
-                        point.setStatus(PointStatus.NORMAL);
-                    }
-                }
-                invalidate();
-                mNeedIntercept = false;
-            }
-        }, delayMilliseconds);
-    }
+    //不应该在控件内部判断密码 维持控件的纯洁度
+//    private void checkPassWord() {
+//        mNeedIntercept = true;
+//        clearStatusDelay(2000);
+//        //如果密码太短 弹出提示 并将所有点状态跟新为error 设置屏幕无法触碰 两秒后清空状态
+//        if (mPressedPoints.size() <= 4) {
+//            Toast.makeText(getContext(), "密码太短！", Toast.LENGTH_SHORT).show();
+//            for (Point point : mPressedPoints) {
+//                point.setStatus(PointStatus.ERROR);
+//            }
+//            return;
+//        }
+//
+//        StringBuffer passBuffer = new StringBuffer();//拼凑密码
+//        for (Point point : mPressedPoints) {
+//            passBuffer.append(point.index);
+//        }
+//        //如果密码正确 弹出提示 设置屏幕无法触碰 两秒之后清空状态
+//        Log.d("TAG", "checkPassWord: mPassWord " + mPassWord + " passBuffer " + passBuffer);
+//        if (passBuffer.toString().equals(mPassWord)) {
+//            Toast.makeText(getContext(), "密码正确！", Toast.LENGTH_SHORT).show();
+//        } else {//如果密码错误 弹出提示 并将所有点状态跟新为error 设置屏幕无法触碰 两秒后清空状态
+//            Toast.makeText(getContext(), "密码错误！", Toast.LENGTH_SHORT).show();
+//            for (Point point : mPressedPoints) {
+//                point.setStatus(PointStatus.ERROR);
+//            }
+//        }
+//    }
 
     private void drawCircle(Canvas canvas) {
         for (Point[] pointArr : mPoints) {
@@ -242,30 +231,6 @@ public class LockPatternView extends View {
         mPoints[2][2] = new Point(getMeasuredWidth() * 4 / 5, getMeasuredWidth() * 4 / 5, 8, PointStatus.NORMAL);
     }
 
-    /**
-     * 获取屏幕的宽度
-     */
-    public static int getScreenWidth(Context context) {
-        if (context == null) {
-            return -1;
-        }
-        Resources resources = context.getResources();
-        DisplayMetrics dm = resources.getDisplayMetrics();
-        return dm.widthPixels;
-    }
-
-    /**
-     * 获取屏幕的高度
-     */
-    public static int getScreenHeight(Context context) {
-        if (context == null) {
-            return -1;
-        }
-        Resources resources = context.getResources();
-        DisplayMetrics dm = resources.getDisplayMetrics();
-        return dm.heightPixels;
-    }
-
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({PointStatus.NORMAL, PointStatus.PRESSED, PointStatus.ERROR})
     public @interface PointStatus {
@@ -296,7 +261,7 @@ public class LockPatternView extends View {
         return Math.sqrt(dx * dx + dy * dy) - mRadiusOut < 0;
     }
 
-    class Point {
+    static class Point {
         int positionX;
         int positionY;
         int index;
@@ -310,17 +275,25 @@ public class LockPatternView extends View {
             this.status = status;
         }
 
-        public void setStatus(@PointStatus int status) {
+        void setStatus(@PointStatus int status) {
             this.status = status;
         }
 
-        public int getStatus() {
+        int getStatus() {
             return status;
         }
     }
 
-    void setPassWord(String passWord) {
-        this.mPassWord = passWord;
+    public void setPointsStatus(@PointStatus int pointsStatus) {
+        for (LockPatternView.Point point : mPressedPoints) {
+            point.setStatus(pointsStatus);
+        }
+        invalidate();
+    }
+
+    public void resetLockPatternView() {
+        setPointsStatus(PointStatus.NORMAL);
+        mPressedPoints.clear();
     }
 
     public void setPassListener(PassListener mPassListener) {
