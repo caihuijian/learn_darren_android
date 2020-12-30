@@ -1,2 +1,3 @@
 include ':app', ':customratingbar', ':lettersidebar', ':taglayout', ':eventdispatch', ':kgslidingmenu', ':qqslidingmenu', 'draglistview'
 include ':lockpatternview'
+include ':materialdesigndemo'

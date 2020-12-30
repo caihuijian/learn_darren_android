@@ -7,6 +7,7 @@
         <option name="testRunner" value="PLATFORM" />
         <option name="distributionType" value="DEFAULT_WRAPPED" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="gradleHome" value="C:/u/gradle-6.5-all/gradle-6.5" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
@@ -17,11 +18,13 @@
             <option value="$PROJECT_DIR$/kgslidingmenu" />
             <option value="$PROJECT_DIR$/lettersidebar" />
             <option value="$PROJECT_DIR$/lockpatternview" />
+            <option value="$PROJECT_DIR$/materialdesigndemo" />
             <option value="$PROJECT_DIR$/qqslidingmenu" />
             <option value="$PROJECT_DIR$/taglayout" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
+        <option name="useQualifiedModuleNames" value="true" />
       </GradleProjectSettings>
     </option>
   </component>
