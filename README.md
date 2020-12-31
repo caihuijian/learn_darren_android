@@ -1,1 +1,4 @@
-# learn_darren_android
+本项目包含了红橙Darren 自定义View中的前半部分视频的大部分demo
+由于在 16.Material Design - 常用控件介绍和使用 这节课中需要同时使用Androidx和Android support，会起冲突 在迁移到AndroidX的时候遇到各种问题，并且目前我对gradle还不是很熟悉。所以放弃把当前项目迁移到AndroidX
+最终该项目包含自定义View中的1-15节的demo 第16节只有个空项目
+后续我会新建另一个项目 该项目从一开始就是AndroidX的
