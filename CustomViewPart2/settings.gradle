@@ -1,2 +1,3 @@
 rootProject.name='CustomViewPart2'
 include ':materialdesigndemo'
+include ':customstatusbar'
