@@ -1,4 +1,4 @@
-package com.example.customstatusbar;
+package com.example.customstatusbar2;
 
 import android.app.Activity;
 import android.content.res.Resources;
