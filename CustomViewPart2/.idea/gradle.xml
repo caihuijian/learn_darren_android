@@ -13,6 +13,7 @@
             <option value="$PROJECT_DIR$/customstatusbar" />
             <option value="$PROJECT_DIR$/customstatusbar2" />
             <option value="$PROJECT_DIR$/materialdesigndemo" />
+            <option value="$PROJECT_DIR$/translationbehavior" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
