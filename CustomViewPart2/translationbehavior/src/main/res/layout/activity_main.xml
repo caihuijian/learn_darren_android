@@ -8,70 +8,78 @@
     tools:context=".MainActivity">
 
 
+    <!--  AppBarLayout十分依赖CoordinatorLayout来实现协调功能 AppBarLayout继承自LinearLayout -->
+    <!--  通过AppBarLayout包裹Toolbar 让Toolbar可以具有某些滑动效果 -->
+    <!--  title部分  -->
     <com.google.android.material.appbar.AppBarLayout
+
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <android.support.v7.widget.Toolbar
+        <!--   添加app:layout_scrollFlags="scroll|enterAlways|snap" 可以让titleBar随着recyclerView向上向下滚动     -->
+        <androidx.appcompat.widget.Toolbar
             android:id="@+id/tool_bar"
-            app:title="知乎首页"
-            app:titleTextColor="#FFFFFF"
-            app:layout_scrollFlags="scroll|enterAlways|snap"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            app:layout_scrollFlags="scroll|enterAlways|snap"
+            app:title="知乎首页"
+            app:titleTextColor="#FFFFFF" />
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!--    <android.support.v7.widget.RecyclerView-->
-    <!--        android:id="@+id/recycler_view"-->
-    <!--        app:layout_behavior="@string/appbar_scrolling_view_behavior"-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="match_parent" />-->
+    <!--  主体部分  -->
+    <!--  加上app:layout_behavior="@string/appbar_scrolling_view_behavior" 使得头部titleBar 底部actionBar不会遮挡  -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
+    <!-- 浮动button -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="70dp"
+        android:src="@drawable/ic_android"
+        app:layout_behavior=".TranslationBehavior" />
 
-    <!--    <android.support.design.widget.FloatingActionButton-->
-    <!--        android:id="@+id/fab"-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:layout_gravity="bottom|end"-->
-    <!--        android:layout_marginBottom="70dp"-->
-    <!--        android:layout_marginEnd="16dp"-->
-    <!--        android:layout_marginRight="16dp"-->
-    <!--        android:src="@drawable/ic_social_share"-->
-    <!--        app:layout_behavior="com.darren.behaviordemo.TranslationBehavior"-->
-    <!--        app:layout_scrollFlags="scroll|enterAlways|snap" />-->
+    <!--  加上app:layout_behavior="@string/bottom_sheet_behavior"使得actionBar自动沉到底部  -->
+    <LinearLayout
+        android:id="@+id/bottom_tab_layout"
+        android:layout_width="match_parent"
+        android:layout_height="?actionBarSize"
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="bottom"
+        android:background="@android:color/white"
+        app:layout_behavior=".TranslationBehavior">
+        <!--    ?actionBarSize 如果不知道是什么意思 也可以自己指定数值    -->
 
-    <!--    <LinearLayout-->
-    <!--        android:id="@+id/bottom_tab_layout"-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="?actionBarSize"-->
-    <!--        android:layout_alignParentBottom="true"-->
-    <!--        android:background="@android:color/white"-->
-    <!--        app:layout_behavior="@string/bottom_sheet_behavior">-->
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:src="@drawable/ic_android" />
 
-    <!--        <ImageView-->
-    <!--            android:layout_width="0dp"-->
-    <!--            android:layout_height="match_parent"-->
-    <!--            android:layout_weight="1"-->
-    <!--            android:src="@drawable/ic_android" />-->
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:src="@drawable/ic_android" />
 
-    <!--        <ImageView-->
-    <!--            android:layout_width="0dp"-->
-    <!--            android:layout_height="match_parent"-->
-    <!--            android:layout_weight="1"-->
-    <!--            android:src="@drawable/ic_android"-->
-    <!--            />-->
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:src="@drawable/ic_android" />
 
-    <!--        <ImageView-->
-    <!--            android:layout_width="0dp"-->
-    <!--            android:layout_height="match_parent"-->
-    <!--            android:src="@drawable/ic_android"-->
-    <!--            android:layout_weight="1"/>-->
-
-    <!--        <ImageView-->
-    <!--            android:layout_width="0dp"-->
-    <!--            android:layout_height="match_parent"-->
-    <!--            android:src="@drawable/ic_android"-->
-    <!--            android:layout_weight="1" />-->
-    <!--    </LinearLayout>-->
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:src="@drawable/ic_android" />
+    </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
