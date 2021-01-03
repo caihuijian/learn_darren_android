@@ -10,6 +10,7 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/custom58loadview" />
             <option value="$PROJECT_DIR$/customstatusbar" />
             <option value="$PROJECT_DIR$/customstatusbar2" />
             <option value="$PROJECT_DIR$/materialdesigndemo" />
