@@ -3,6 +3,7 @@ package com.example.customfilterview;
 import android.content.Context;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 /**
@@ -36,6 +37,9 @@ class FilterViewAdapter extends BaseFilterViewAdapter {
         TextView textContentView = new TextView(mContext);
         textContentView.setGravity(Gravity.CENTER);
         textContentView.setText(tabTexts[position]);
+        RelativeLayout.LayoutParams contentViewLayoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        contentViewLayoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
+        textContentView.setLayoutParams(contentViewLayoutParams);
         return textContentView;
     }
 }
