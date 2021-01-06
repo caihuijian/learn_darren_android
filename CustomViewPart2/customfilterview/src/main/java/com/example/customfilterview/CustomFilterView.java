@@ -1,8 +1,12 @@
 package com.example.customfilterview;
 
+import android.animation.Animator;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.graphics.Color;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -15,11 +19,13 @@ import androidx.annotation.Nullable;
  */
 class CustomFilterView extends RelativeLayout implements View.OnClickListener {
 
+    private static final long ANIMATION_DURATION = 500;
     private LinearLayout mContainerTab;
     private RelativeLayout mContainerContent;
     private View mShadowView;
     private BaseFilterViewAdapter mFilterViewAdapter;
     private int mCurrentTabIndex = 0;//当前所处Tab的位置
+    private boolean isAnimating = false;
 
 
     public CustomFilterView(Context context) {
@@ -63,6 +69,7 @@ class CustomFilterView extends RelativeLayout implements View.OnClickListener {
         //给第零页设置为选中状态
         ((TextView) mContainerTab.getChildAt(mCurrentTabIndex)).setTextColor(Color.RED);
         ((TextView) mContainerTab.getChildAt(mCurrentTabIndex)).setBackgroundColor(Color.GRAY);
+        mShadowView.setOnClickListener(this);
     }
 
     @Override
@@ -79,17 +86,22 @@ class CustomFilterView extends RelativeLayout implements View.OnClickListener {
         //轮巡tab页 看看是不是点击了tab页
         int tabCount = mFilterViewAdapter.getCount();
         for (int i = 0; i < tabCount; i++) {
+            if (isAnimating) {
+                return;
+            }
             //点击了某一个tab页
             if (mContainerTab.getChildAt(i) == v) {
                 //点击了当前显示的tab页 关闭主体内容 切换tab页颜色
                 if (mContainerTab.getChildAt(mCurrentTabIndex) == v) {
-                    ((TextView) mContainerTab.getChildAt(mCurrentTabIndex)).setTextColor(Color.BLACK);
-                    ((TextView) mContainerTab.getChildAt(mCurrentTabIndex)).setBackgroundColor(Color.WHITE);
-                    mContainerContent.removeAllViews();
+                    closeContent();
+                } else if (mCurrentTabIndex == -1) {//当前没有显示的tab页
+                    openContent(i);
                 } else {//点击了非当前显示的tab页  tab页text的颜色需要变化（注意新旧的当前页面都要变化） 内容需要变化
+                    //旧tab状态更新
                     ((TextView) mContainerTab.getChildAt(mCurrentTabIndex)).setTextColor(Color.BLACK);
                     ((TextView) mContainerTab.getChildAt(mCurrentTabIndex)).setBackgroundColor(Color.WHITE);
                     mCurrentTabIndex = i;
+                    //新tab页状态更新
                     ((TextView) mContainerTab.getChildAt(mCurrentTabIndex)).setTextColor(Color.RED);
                     ((TextView) mContainerTab.getChildAt(mCurrentTabIndex)).setBackgroundColor(Color.GRAY);
                     mContainerContent.removeAllViews();
@@ -97,5 +109,89 @@ class CustomFilterView extends RelativeLayout implements View.OnClickListener {
                 }
             }
         }
+
+        //如果点击了shadowView 同样关闭主体部分
+        if(v == mShadowView && !isAnimating){
+            closeContent();
+        }
+    }
+
+    private void closeContent() {
+        ((TextView) mContainerTab.getChildAt(mCurrentTabIndex)).setTextColor(Color.BLACK);
+        ((TextView) mContainerTab.getChildAt(mCurrentTabIndex)).setBackgroundColor(Color.WHITE);
+        mContainerContent.removeAllViews();
+        mCurrentTabIndex = -1;
+        //添加旧页面关闭动画
+        ObjectAnimator transactionAnimateInY = ObjectAnimator.ofFloat(mContainerContent, "translationY", 0, -mContainerContent.getMeasuredHeight());
+        ObjectAnimator alphaAnimate = ObjectAnimator.ofFloat(mShadowView, "alpha", 1f, 0);
+        AnimatorSet animatorSet = new AnimatorSet();
+        animatorSet.setDuration(ANIMATION_DURATION);
+        //顺序播放动画
+        animatorSet.playTogether(transactionAnimateInY, alphaAnimate);
+        animatorSet.start();
+        isAnimating = true;
+        animatorSet.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                mContainerContent.removeAllViews();
+                mShadowView.setAlpha(0);
+                isAnimating = false;
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+    }
+
+    private void openContent(int tabIndex) {
+        //新tab页状态更新
+        mCurrentTabIndex = tabIndex;
+        ((TextView) mContainerTab.getChildAt(mCurrentTabIndex)).setTextColor(Color.RED);
+        ((TextView) mContainerTab.getChildAt(mCurrentTabIndex)).setBackgroundColor(Color.GRAY);
+        mContainerContent.addView(mFilterViewAdapter.getContentView(tabIndex));
+        //添加新页面打开动画
+        //设置主体位置的位移动画和阴影透明度动画
+        mShadowView.setAlpha(0);
+        ObjectAnimator transactionAnimateInY = ObjectAnimator.ofFloat(mContainerContent, "translationY", -mContainerContent.getMeasuredHeight(), 0);
+        ObjectAnimator alphaAnimate = ObjectAnimator.ofFloat(mShadowView, "alpha", 0, 1f);
+        AnimatorSet animatorSet = new AnimatorSet();
+        animatorSet.setDuration(ANIMATION_DURATION);
+        //顺序播放动画
+        animatorSet.playTogether(transactionAnimateInY, alphaAnimate);
+        animatorSet.start();
+        isAnimating = true;
+        animatorSet.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                isAnimating = false;
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
     }
 }

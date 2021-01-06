@@ -4,16 +4,18 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <LinearLayout
-        android:id="@+id/container_tab"
+    <RelativeLayout
+        android:background="#cfc"
+        android:layout_below="@+id/container_tab"
+        android:layout_above="@+id/view_shadow"
+        android:id="@+id/container_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal" />
 
-    <RelativeLayout
-        android:layout_below="@+id/container_tab"
-        android:layout_above="@+id/view_shadow"
-        android:id="@+id/container_content"
+    <LinearLayout
+        android:background="#fff"
+        android:id="@+id/container_tab"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal" />
