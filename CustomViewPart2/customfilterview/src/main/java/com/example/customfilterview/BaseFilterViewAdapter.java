@@ -8,34 +8,22 @@ import java.util.ArrayList;
 /**
  * Created by Cai Huijian on 2021/1/5.
  */
-abstract class BaseFilterViewAdapter {
+public interface BaseFilterViewAdapter {
 
-    //角色定位 抽象的被观察者 参考ListView的BaseAdapter
-    //开始 抽象的被观察者
-    protected final ArrayList<ContentClickObserver> mObservers = new ArrayList<>();
+    //角色定位 抽象的被观察者 参考ListView的Adapter.java
+    void registerObserver(ContentClickObserver observer);
 
-    public void registerObserver(ContentClickObserver observer) {
-        mObservers.add(observer);
-    }
+    void unregisterObserver(ContentClickObserver observer);
 
-    public void unregisterObserver(ContentClickObserver observer) {
-        mObservers.remove(observer);
-    }
-
-    public void notifyContentItemClick(View view) {
-        for (ContentClickObserver observer : mObservers) {
-            observer.contentItemClick(view);
-        }
-    }
-    //结束 抽象的被观察者
+    void notifyContentItemClick(View view);
 
 
     // 获取总共有几个tab页
-    public abstract int getCount();
+    abstract int getCount();
 
     // 获取当前tab的TabView
-    public abstract View getTabView(int position);
+    abstract View getTabView(int position);
 
     // 获取当前tab的菜单内容
-    public abstract View getContentView(int position);
+    abstract View getContentView(int position);
 }

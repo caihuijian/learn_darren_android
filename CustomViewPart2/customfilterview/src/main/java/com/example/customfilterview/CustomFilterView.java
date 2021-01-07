@@ -47,6 +47,7 @@ class CustomFilterView extends RelativeLayout implements View.OnClickListener {
         mShadowView = findViewById(R.id.view_shadow);
     }
 
+    //CustomFilterView相当于ListView
     public void setFilterViewAdapter(BaseFilterViewAdapter filterViewAdapter) {
         //参考ListView的setAdapter
         if (mFilterViewAdapter != null && mObserver != null) {
@@ -54,8 +55,9 @@ class CustomFilterView extends RelativeLayout implements View.OnClickListener {
         }
         this.mFilterViewAdapter = filterViewAdapter;
         mObserver = new FilterViewAdapterContentClickObserver();
+        //Adapter是具体的观察者（调用registerObserver的对象是观察者）
         mFilterViewAdapter.registerObserver(mObserver);
-        //Adapter是具体的观察者
+
 
         //获取当前有几个tab页
         int count = mFilterViewAdapter.getCount();
