@@ -19,13 +19,15 @@ import androidx.annotation.Nullable;
  */
 class CustomFilterView extends RelativeLayout implements View.OnClickListener {
 
-    private static final long ANIMATION_DURATION = 500;
+    private static final long ANIMATION_DURATION = 300;
+    private static final String TAG = "CustomFilterView";
     private LinearLayout mContainerTab;
     private RelativeLayout mContainerContent;
     private View mShadowView;
     private BaseFilterViewAdapter mFilterViewAdapter;
     private int mCurrentTabIndex = 0;//当前所处Tab的位置
     private boolean isAnimating = false;
+    private FilterViewAdapterContentClickObserver mObserver;
 
 
     public CustomFilterView(Context context) {
@@ -46,7 +48,15 @@ class CustomFilterView extends RelativeLayout implements View.OnClickListener {
     }
 
     public void setFilterViewAdapter(BaseFilterViewAdapter filterViewAdapter) {
+        //参考ListView的setAdapter
+        if (mFilterViewAdapter != null && mObserver != null) {
+            mFilterViewAdapter.unregisterObserver(mObserver);
+        }
         this.mFilterViewAdapter = filterViewAdapter;
+        mObserver = new FilterViewAdapterContentClickObserver();
+        mFilterViewAdapter.registerObserver(mObserver);
+        //Adapter是具体的观察者
+
         //获取当前有几个tab页
         int count = mFilterViewAdapter.getCount();
         for (int i = 0; i < count; i++) {
@@ -86,9 +96,7 @@ class CustomFilterView extends RelativeLayout implements View.OnClickListener {
         //轮巡tab页 看看是不是点击了tab页
         int tabCount = mFilterViewAdapter.getCount();
         for (int i = 0; i < tabCount; i++) {
-            if (isAnimating) {
-                return;
-            }
+            Log.d(TAG, "onClick: " + isAnimating);
             //点击了某一个tab页
             if (mContainerTab.getChildAt(i) == v) {
                 //点击了当前显示的tab页 关闭主体内容 切换tab页颜色
@@ -111,12 +119,16 @@ class CustomFilterView extends RelativeLayout implements View.OnClickListener {
         }
 
         //如果点击了shadowView 同样关闭主体部分
-        if(v == mShadowView && !isAnimating){
+        if (v == mShadowView) {
             closeContent();
         }
     }
 
     private void closeContent() {
+        if (isAnimating) {
+            return;
+        }
+        isAnimating = true;
         ((TextView) mContainerTab.getChildAt(mCurrentTabIndex)).setTextColor(Color.BLACK);
         ((TextView) mContainerTab.getChildAt(mCurrentTabIndex)).setBackgroundColor(Color.WHITE);
         mContainerContent.removeAllViews();
@@ -129,7 +141,6 @@ class CustomFilterView extends RelativeLayout implements View.OnClickListener {
         //顺序播放动画
         animatorSet.playTogether(transactionAnimateInY, alphaAnimate);
         animatorSet.start();
-        isAnimating = true;
         animatorSet.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animation) {
@@ -139,7 +150,7 @@ class CustomFilterView extends RelativeLayout implements View.OnClickListener {
             @Override
             public void onAnimationEnd(Animator animation) {
                 mContainerContent.removeAllViews();
-                mShadowView.setAlpha(0);
+                mShadowView.setVisibility(GONE);
                 isAnimating = false;
             }
 
@@ -156,6 +167,10 @@ class CustomFilterView extends RelativeLayout implements View.OnClickListener {
     }
 
     private void openContent(int tabIndex) {
+        if (isAnimating) {
+            return;
+        }
+        isAnimating = true;
         //新tab页状态更新
         mCurrentTabIndex = tabIndex;
         ((TextView) mContainerTab.getChildAt(mCurrentTabIndex)).setTextColor(Color.RED);
@@ -163,7 +178,7 @@ class CustomFilterView extends RelativeLayout implements View.OnClickListener {
         mContainerContent.addView(mFilterViewAdapter.getContentView(tabIndex));
         //添加新页面打开动画
         //设置主体位置的位移动画和阴影透明度动画
-        mShadowView.setAlpha(0);
+        mShadowView.setVisibility(VISIBLE);
         ObjectAnimator transactionAnimateInY = ObjectAnimator.ofFloat(mContainerContent, "translationY", -mContainerContent.getMeasuredHeight(), 0);
         ObjectAnimator alphaAnimate = ObjectAnimator.ofFloat(mShadowView, "alpha", 0, 1f);
         AnimatorSet animatorSet = new AnimatorSet();
@@ -171,7 +186,6 @@ class CustomFilterView extends RelativeLayout implements View.OnClickListener {
         //顺序播放动画
         animatorSet.playTogether(transactionAnimateInY, alphaAnimate);
         animatorSet.start();
-        isAnimating = true;
         animatorSet.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animation) {
@@ -193,5 +207,14 @@ class CustomFilterView extends RelativeLayout implements View.OnClickListener {
 
             }
         });
+    }
+
+    //角色定位 抽象观察者的实现者 类比ListView中的DataSetObservable
+    class FilterViewAdapterContentClickObserver extends ContentClickObserver {
+
+        @Override
+        void contentItemClick(View view) {//因为demo的content是一个textView 这里的view没有实际意义
+            closeContent();
+        }
     }
 }

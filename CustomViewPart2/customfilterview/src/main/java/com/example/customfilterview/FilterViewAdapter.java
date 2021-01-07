@@ -1,8 +1,10 @@
 package com.example.customfilterview;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -37,9 +39,16 @@ class FilterViewAdapter extends BaseFilterViewAdapter {
         TextView textContentView = new TextView(mContext);
         textContentView.setGravity(Gravity.CENTER);
         textContentView.setText(tabTexts[position]);
-        RelativeLayout.LayoutParams contentViewLayoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        RelativeLayout.LayoutParams contentViewLayoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
         contentViewLayoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
         textContentView.setLayoutParams(contentViewLayoutParams);
+
+        textContentView.setOnClickListener(v -> {
+            //TODO 角色定位
+            //事件源 具体的被观察者 这里通知其他观察者事件
+            notifyContentItemClick(v);
+        });
+
         return textContentView;
     }
 }
