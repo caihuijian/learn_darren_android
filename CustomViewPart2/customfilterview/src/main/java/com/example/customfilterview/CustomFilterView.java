@@ -17,17 +17,17 @@ import androidx.annotation.Nullable;
 /**
  * Created by Cai Huijian on 2021/1/5.
  */
-class CustomFilterView extends RelativeLayout implements View.OnClickListener {
+class CustomFilterView extends RelativeLayout implements View.OnClickListener {//角色定位 CustomFilterView相当于ListView
 
     private static final long ANIMATION_DURATION = 300;
     private static final String TAG = "CustomFilterView";
     private LinearLayout mContainerTab;
     private RelativeLayout mContainerContent;
     private View mShadowView;
-    private BaseFilterViewAdapter mFilterViewAdapter;
+    private ViewAdapter mFilterViewAdapter;
     private int mCurrentTabIndex = 0;//当前所处Tab的位置
     private boolean isAnimating = false;
-    private FilterViewAdapterContentClickObserver mObserver;
+    private AdapterObserver mObserver;
 
 
     public CustomFilterView(Context context) {
@@ -47,14 +47,13 @@ class CustomFilterView extends RelativeLayout implements View.OnClickListener {
         mShadowView = findViewById(R.id.view_shadow);
     }
 
-    //CustomFilterView相当于ListView
-    public void setFilterViewAdapter(BaseFilterViewAdapter filterViewAdapter) {
+    public void setFilterViewAdapter(ViewAdapter filterViewAdapter) {
         //参考ListView的setAdapter
         if (mFilterViewAdapter != null && mObserver != null) {
             mFilterViewAdapter.unregisterObserver(mObserver);
         }
         this.mFilterViewAdapter = filterViewAdapter;
-        mObserver = new FilterViewAdapterContentClickObserver();
+        mObserver = new AdapterObserver();
         //Adapter是具体的观察者（调用registerObserver的对象是观察者）
         mFilterViewAdapter.registerObserver(mObserver);
 
@@ -211,11 +210,10 @@ class CustomFilterView extends RelativeLayout implements View.OnClickListener {
         });
     }
 
-    //角色定位 抽象观察者的实现者 类比ListView中的DataSetObservable
-    class FilterViewAdapterContentClickObserver extends ContentClickObserver {
-
+    //角色定位 具体观察者 类比ListView中的AdapterDataSetObserver
+    class AdapterObserver implements Observer {
         @Override
-        void contentItemClick(View view) {//因为demo的content是一个textView 这里的view没有实际意义
+        public void notifyDataSetChanged() {
             closeContent();
         }
     }

@@ -1,19 +1,16 @@
 package com.example.customfilterview;
 
-import android.database.DataSetObserver;
 import android.view.View;
-
-import java.util.ArrayList;
 
 /**
  * Created by Cai Huijian on 2021/1/5.
  */
-public interface BaseFilterViewAdapter {
+public interface ViewAdapter {
 
     //角色定位 抽象的被观察者 参考ListView的Adapter.java
-    void registerObserver(ContentClickObserver observer);
+    void registerObserver(Observer observer);
 
-    void unregisterObserver(ContentClickObserver observer);
+    void unregisterObserver(Observer observer);
 
     void notifyContentItemClick(View view);
 

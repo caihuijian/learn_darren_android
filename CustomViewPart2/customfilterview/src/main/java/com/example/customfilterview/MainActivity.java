@@ -12,7 +12,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        BaseFilterViewAdapter filterViewAdapter = new FilterViewAdapter(this);
+        ViewAdapter filterViewAdapter = new ViewBaseAdapter(this);
         mCustomFilterView = findViewById(R.id.filterView);
         mCustomFilterView.setFilterViewAdapter(filterViewAdapter);
     }

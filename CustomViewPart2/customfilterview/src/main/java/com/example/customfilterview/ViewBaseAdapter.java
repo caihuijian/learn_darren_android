@@ -1,10 +1,8 @@
 package com.example.customfilterview;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -13,30 +11,30 @@ import java.util.ArrayList;
 /**
  * Created by Cai Huijian on 2021/1/5.
  */
-class FilterViewAdapter implements BaseFilterViewAdapter {//角色定位 具体的被观察者 类比ListView的BaseAdapter
+class ViewBaseAdapter implements ViewAdapter {//角色定位 具体的被观察者 类比ListView的BaseAdapter
     private Context mContext;
     String[] tabTexts = {"美食", "生活", "鬼畜", "动漫区", "其他"};
-    protected final ArrayList<ContentClickObserver> mObservers = new ArrayList<>();
+    protected final ArrayList<Observer> mObservers = new ArrayList<>();
 
     @Override
-    public void registerObserver(ContentClickObserver observer) {
+    public void registerObserver(Observer observer) {
         mObservers.add(observer);
     }
 
     @Override
-    public void unregisterObserver(ContentClickObserver observer) {
+    public void unregisterObserver(Observer observer) {
         mObservers.remove(observer);
     }
 
     @Override
     public void notifyContentItemClick(View view) {
-        for (ContentClickObserver observer : mObservers) {
-            observer.contentItemClick(view);
+        for (Observer observer : mObservers) {
+            observer.notifyDataSetChanged();
         }
     }
 
 
-    public FilterViewAdapter(Context context) {
+    public ViewBaseAdapter(Context context) {
         this.mContext = context;
     }
 
