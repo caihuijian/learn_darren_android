@@ -132,7 +132,6 @@ class CustomFilterView extends RelativeLayout implements View.OnClickListener {/
         isAnimating = true;
         ((TextView) mContainerTab.getChildAt(mCurrentTabIndex)).setTextColor(Color.BLACK);
         ((TextView) mContainerTab.getChildAt(mCurrentTabIndex)).setBackgroundColor(Color.WHITE);
-        mContainerContent.removeAllViews();
         mCurrentTabIndex = -1;
         //添加旧页面关闭动画
         ObjectAnimator transactionAnimateInY = ObjectAnimator.ofFloat(mContainerContent, "translationY", 0, -mContainerContent.getMeasuredHeight());
@@ -150,7 +149,7 @@ class CustomFilterView extends RelativeLayout implements View.OnClickListener {/
 
             @Override
             public void onAnimationEnd(Animator animation) {
-                mContainerContent.removeAllViews();
+                mContainerContent.setVisibility(GONE);
                 mShadowView.setVisibility(GONE);
                 isAnimating = false;
             }
@@ -176,7 +175,7 @@ class CustomFilterView extends RelativeLayout implements View.OnClickListener {/
         mCurrentTabIndex = tabIndex;
         ((TextView) mContainerTab.getChildAt(mCurrentTabIndex)).setTextColor(Color.RED);
         ((TextView) mContainerTab.getChildAt(mCurrentTabIndex)).setBackgroundColor(Color.GRAY);
-        mContainerContent.addView(mFilterViewAdapter.getContentView(tabIndex));
+        mContainerContent.setVisibility(VISIBLE);
         //添加新页面打开动画
         //设置主体位置的位移动画和阴影透明度动画
         mShadowView.setVisibility(VISIBLE);
