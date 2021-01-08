@@ -1,3 +1,4 @@
+include ':circleloadingview'
 include ':customfilterview'
 rootProject.name='CustomViewPart2'
 include ':materialdesigndemo'

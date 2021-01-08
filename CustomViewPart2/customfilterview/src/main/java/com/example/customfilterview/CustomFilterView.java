@@ -176,6 +176,8 @@ class CustomFilterView extends RelativeLayout implements View.OnClickListener {/
         ((TextView) mContainerTab.getChildAt(mCurrentTabIndex)).setTextColor(Color.RED);
         ((TextView) mContainerTab.getChildAt(mCurrentTabIndex)).setBackgroundColor(Color.GRAY);
         mContainerContent.setVisibility(VISIBLE);
+        mContainerContent.removeAllViews();
+        mContainerContent.addView(mFilterViewAdapter.getContentView(tabIndex));
         //添加新页面打开动画
         //设置主体位置的位移动画和阴影透明度动画
         mShadowView.setVisibility(VISIBLE);
