@@ -7,7 +7,8 @@ import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.graphics.Color;
 import android.util.AttributeSet;
-import android.util.Log;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.RelativeLayout;
 
 /**
@@ -18,6 +19,8 @@ class CircleLoadingView extends RelativeLayout {
     private SingleCircle mCircleLeft, mCircleCenter, mCircleRight;
     private float mAnimateDistance;
     private int mAnimateDuration = 500;
+    AnimatorSet mAnimatorSet4Out;
+    AnimatorSet mAnimatorSet4In;
 
 
     public CircleLoadingView(Context context) {
@@ -42,43 +45,47 @@ class CircleLoadingView extends RelativeLayout {
     }
 
 
+    //往外跑
     private void startOutAnimate() {
-        Log.d(TAG, "startOutAnimate: ");
-        ObjectAnimator translationLeftOut = ObjectAnimator.ofFloat(mCircleLeft, "translationX", 0, -mAnimateDistance);
-        ObjectAnimator translationRightOut = ObjectAnimator.ofFloat(mCircleRight, "translationX", 0, mAnimateDistance);
-        AnimatorSet animatorSet4Out = new AnimatorSet();
-        animatorSet4Out.playTogether(translationLeftOut, translationRightOut);
-        animatorSet4Out.setDuration(mAnimateDuration);
-        animatorSet4Out.start();
-        animatorSet4Out.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation, boolean isReverse) {
-                Log.d(TAG, "startOutAnimate onAnimationEnd: ");
-                startInAnimate();
-            }
-        });
-
+        if (mAnimatorSet4Out == null) {
+            ObjectAnimator translationLeftOut = ObjectAnimator.ofFloat(mCircleLeft, "translationX", 0, -mAnimateDistance);
+            ObjectAnimator translationRightOut = ObjectAnimator.ofFloat(mCircleRight, "translationX", 0, mAnimateDistance);
+            mAnimatorSet4Out = new AnimatorSet();
+            mAnimatorSet4Out.setInterpolator(new DecelerateInterpolator(2f));//2f表示比原来的动画更明显 减速动画
+            mAnimatorSet4Out.playTogether(translationLeftOut, translationRightOut);
+            mAnimatorSet4Out.setDuration(mAnimateDuration);
+            mAnimatorSet4Out.start();
+            mAnimatorSet4Out.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation, boolean isReverse) {
+                    startInAnimate();//往里跑
+                }
+            });
+        }
+        mAnimatorSet4Out.start();
     }
 
+    //往里跑
     private void startInAnimate() {
-        Log.d(TAG, "startInAnimate: ");
-        ObjectAnimator translationLeftIn = ObjectAnimator.ofFloat(mCircleLeft, "translationX", -mAnimateDistance, 0);
-        ObjectAnimator translationRightIn = ObjectAnimator.ofFloat(mCircleRight, "translationX", mAnimateDistance, 0);
-        AnimatorSet animatorSet4In = new AnimatorSet();
-        animatorSet4In.resume();
-        animatorSet4In.playTogether(translationLeftIn, translationRightIn);
-        animatorSet4In.setDuration(mAnimateDuration);
-        animatorSet4In.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation, boolean isReverse) {
-                Log.d(TAG, "startInAnimate onAnimationEnd: ");
-                exchangeColor();
-                startOutAnimate();
-            }
-        });
-        animatorSet4In.start();
+        if (mAnimatorSet4In == null) {
+            ObjectAnimator translationLeftIn = ObjectAnimator.ofFloat(mCircleLeft, "translationX", -mAnimateDistance, 0);
+            ObjectAnimator translationRightIn = ObjectAnimator.ofFloat(mCircleRight, "translationX", mAnimateDistance, 0);
+            mAnimatorSet4In = new AnimatorSet();
+            mAnimatorSet4In.setInterpolator(new AccelerateInterpolator(2f));//2f表示比原来的动画更明显 加速动画
+            mAnimatorSet4In.playTogether(translationLeftIn, translationRightIn);
+            mAnimatorSet4In.setDuration(mAnimateDuration);
+            mAnimatorSet4In.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation, boolean isReverse) {
+                    exchangeColor();//交换颜色
+                    startOutAnimate();//往外跑
+                }
+            });
+        }
+        mAnimatorSet4In.start();
     }
 
+    //点集中到中间 交换颜色
     private void exchangeColor() {
         int leftColor = mCircleLeft.getColor();
         int centerColor = mCircleCenter.getColor();
@@ -88,8 +95,10 @@ class CircleLoadingView extends RelativeLayout {
         mCircleLeft.changeColor(rightColor);
     }
 
+    //释放资源
     public void loadingComplete() {
-//        mCircleLeft.
+        mAnimatorSet4Out.cancel();
+        mAnimatorSet4In.cancel();
         removeAllViews();
     }
 }

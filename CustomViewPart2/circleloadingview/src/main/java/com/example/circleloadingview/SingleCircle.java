@@ -41,7 +41,7 @@ class SingleCircle extends View {
     public void changeColor(int color) {
         mPaint.setColor(color);
         mColor = color;
-        invalidate();
+        invalidate();//交换颜色之后需要重新绘制 否则颜色没有实际变化
     }
 
     public int getColor() {
