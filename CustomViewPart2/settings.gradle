@@ -1,3 +1,4 @@
+include ':bezierview'
 include ':circleloadingview'
 include ':customfilterview'
 rootProject.name='CustomViewPart2'
