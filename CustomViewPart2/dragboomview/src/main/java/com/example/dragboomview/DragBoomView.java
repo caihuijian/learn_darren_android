@@ -1,6 +1,7 @@
 package com.example.dragboomview;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -9,32 +10,38 @@ import android.graphics.PointF;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
 /**
  * Created by Cai Huijian on 2021/1/10.
  */
-class BezierView extends View {
+class DragBoomView extends View {
     private PointF mFixPoint;
     private PointF mFingerPoint;
     private Paint mPaint;
     private float mFixPointInitRadius = 10;//固定圆初始半径
     private float mFixPointChangedRadius;//挪动手指后的固定圆半径
     private float mFingerPointRadius = 10;
+    private Bitmap mCaptureView;//截图
 
 
-    public BezierView(Context context) {
+    public DragBoomView(Context context) {
         this(context, null);
     }
 
-    public BezierView(Context context, @Nullable AttributeSet attrs) {
+    public DragBoomView(Context context, @Nullable AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public BezierView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public DragBoomView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initPaint();
+    }
+
+    public static void attachToView(TextView textView) {
+        textView.setOnTouchListener(new DragBoomViewTouchListener(textView));
     }
 
     private void initPaint() {
@@ -57,6 +64,11 @@ class BezierView extends View {
 
         //绘制跟随手指的圆
         canvas.drawCircle(mFingerPoint.x, mFingerPoint.y, mFingerPointRadius, mPaint);
+
+        //绘制截图
+        if (mCaptureView != null){
+            canvas.drawBitmap(mCaptureView,0,0,mPaint);
+        }
     }
 
     //计算两点之间的距离
@@ -126,5 +138,13 @@ class BezierView extends View {
         bezierPath.quadTo(controlPint1x, controlPint1y, B1x, B1y);
         bezierPath.close();
         return bezierPath;
+    }
+
+    public void setDragViewTouchListener(DragBoomViewTouchListener dragBoomViewTouchListener) {
+        //setOnTouchListener(dragBoomViewTouchListener);
+    }
+
+    public void setCaptureView(Bitmap bitmap) {
+        this.mCaptureView = bitmap;
     }
 }
