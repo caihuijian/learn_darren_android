@@ -1,5 +1,9 @@
 package com.example.dragboomview;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -23,8 +27,11 @@ class DragBoomView extends View {
     private PointF mFingerPoint;
     private Paint mPaint;
     private float mFixPointInitRadius = 10;//固定圆初始半径
+    private float minFixPointRadius = 5;//固定圆最小半径 如果比这个更小 不进行绘制
     private float mFixPointChangedRadius;//挪动手指后的固定圆半径
     private float mFingerPointRadius = 10;
+    private DragBoomViewTouchListener mDragBoomViewTouchListener;
+
     private Bitmap mCaptureView;//截图
 
 
@@ -41,6 +48,7 @@ class DragBoomView extends View {
         initPaint();
         mFixPointInitRadius = Utils.dp2px(mFixPointInitRadius, context);
         mFingerPointRadius = Utils.dp2px(mFingerPointRadius, context);
+        minFixPointRadius = Utils.dp2px(minFixPointRadius, context);
     }
 
     public static void attachToView(View textView) {
@@ -60,7 +68,8 @@ class DragBoomView extends View {
             return;
         }
         //绘制固定圆
-        if (mFixPointChangedRadius > 5) {//当手指离固定圆太远 不绘制固定圆
+        if (isNeedShowBezier()) {//当手指离固定圆太远 不绘制固定圆
+
             canvas.drawCircle(mFixPoint.x, mFixPoint.y, mFixPointChangedRadius, mPaint);
             canvas.drawPath(getBezierPath(), mPaint);
         }
@@ -71,7 +80,6 @@ class DragBoomView extends View {
         //绘制截图
         if (mCaptureView != null) {
             canvas.drawBitmap(mCaptureView, mFingerPoint.x - mCaptureView.getWidth() / 2, mFingerPoint.y - mCaptureView.getHeight() / 2, mPaint);
-            Log.e("TAG", "onDraw: ");
         }
     }
 
@@ -145,7 +153,7 @@ class DragBoomView extends View {
     }
 
     public void setDragViewTouchListener(DragBoomViewTouchListener dragBoomViewTouchListener) {
-        //setOnTouchListener(dragBoomViewTouchListener);
+        mDragBoomViewTouchListener = dragBoomViewTouchListener;
     }
 
     public void setCaptureView(Bitmap bitmap) {
@@ -162,13 +170,38 @@ class DragBoomView extends View {
         invalidate();
     }
 
-    public void initOriginView(float fixPositionX, float fixPositionY) {
-        Log.e("TAG", "initOriginPosition: " + fixPositionX + " " + fixPositionY);
-        if (mFixPoint == null) {
-            mFixPoint = new PointF();
-        }
-        mFixPoint.x = fixPositionX;
-        mFixPoint.y = fixPositionY;
+    public void initPoints(float pointX, float pointY) {
+        mFixPoint = new PointF(pointX, pointY);
+        mFingerPoint = new PointF(pointX, pointY);
         invalidate();
+    }
+
+    private boolean isNeedShowBezier() {
+        return mFixPointChangedRadius > Utils.dp2px(minFixPointRadius, getContext());
+    }
+
+    public void dealActionUp() {
+        if (this.isNeedShowBezier()) { //4.1如果 抬起时距离不大，view回弹
+            playBackAnimate();
+        } else {//4.5如果View拖动很远 则触发消失的动作。将原先的View设置为Gone，隐藏拖动的截图，播放爆炸的帧动画，播放完毕释放资源
+
+        }
+    }
+
+    private void playBackAnimate() {
+        ObjectAnimator translationX = ObjectAnimator.ofFloat(this, "translationX", mFingerPoint.x, mFixPoint.x);
+        ObjectAnimator translationY = ObjectAnimator.ofFloat(this, "translationY", mFingerPoint.y, mFixPoint.y);
+        AnimatorSet animatorSet = new AnimatorSet();
+        animatorSet.playTogether(translationX, translationY);
+        animatorSet.setDuration(1000 * 2);
+        animatorSet.start();
+        animatorSet.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                if (mDragBoomViewTouchListener != null) {
+                    mDragBoomViewTouchListener.reset();
+                }
+            }
+        });
     }
 }
