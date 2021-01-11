@@ -16,13 +16,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         TextView textView =  findViewById(R.id.textView);
         DragBoomView.attachToView(textView);
-        textView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(MainActivity.this,"click",Toast.LENGTH_SHORT).show();
-            }
-        });
-
         //TODO 截图被放在了那一层？？？
+        //TODO DragBoomViewTouchListener 和DragBoomView 职责不清
     }
 }

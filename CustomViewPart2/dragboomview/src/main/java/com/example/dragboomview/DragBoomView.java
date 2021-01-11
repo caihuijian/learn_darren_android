@@ -8,6 +8,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PointF;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
@@ -38,9 +39,11 @@ class DragBoomView extends View {
     public DragBoomView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initPaint();
+        mFixPointInitRadius = Utils.dp2px(mFixPointInitRadius, context);
+        mFingerPointRadius = Utils.dp2px(mFingerPointRadius, context);
     }
 
-    public static void attachToView(TextView textView) {
+    public static void attachToView(View textView) {
         textView.setOnTouchListener(new DragBoomViewTouchListener(textView));
     }
 
@@ -66,8 +69,9 @@ class DragBoomView extends View {
         canvas.drawCircle(mFingerPoint.x, mFingerPoint.y, mFingerPointRadius, mPaint);
 
         //绘制截图
-        if (mCaptureView != null){
-            canvas.drawBitmap(mCaptureView,0,0,mPaint);
+        if (mCaptureView != null) {
+            canvas.drawBitmap(mCaptureView, mFingerPoint.x - mCaptureView.getWidth() / 2, mFingerPoint.y - mCaptureView.getHeight() / 2, mPaint);
+            Log.e("TAG", "onDraw: ");
         }
     }
 
@@ -77,28 +81,28 @@ class DragBoomView extends View {
         return Math.sqrt(Math.pow(point1.x - point2.x, 2) + Math.pow(point1.y - point2.y, 2));
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                mFixPoint = new PointF();
-                mFingerPoint = new PointF();
-                mFixPoint.x = event.getX();
-                mFixPoint.y = event.getY();
-                mFingerPoint.x = event.getX();
-                mFingerPoint.y = event.getY();
-            case MotionEvent.ACTION_MOVE:
-                mFingerPoint.x = event.getX();
-                mFingerPoint.y = event.getY();
-                break;
-            case MotionEvent.ACTION_UP:
-                break;
-        }
-        //根据手指的移动 计算两点之间的距离 根据距离改变mFixPoint的半径
-        mFixPointChangedRadius = calculateFixPointRadius(distanceOfPoints(mFingerPoint, mFixPoint));
-        invalidate();
-        return true;
-    }
+//    @Override
+//    public boolean onTouchEvent(MotionEvent event) {
+//        switch (event.getAction()) {
+//            case MotionEvent.ACTION_DOWN:
+//                mFixPoint = new PointF();
+//                mFingerPoint = new PointF();
+//                mFixPoint.x = event.getX();
+//                mFixPoint.y = event.getY();
+//                mFingerPoint.x = event.getX();
+//                mFingerPoint.y = event.getY();
+//            case MotionEvent.ACTION_MOVE:
+//                mFingerPoint.x = event.getX();
+//                mFingerPoint.y = event.getY();
+//                break;
+//            case MotionEvent.ACTION_UP:
+//                break;
+//        }
+//        //根据手指的移动 计算两点之间的距离 根据距离改变mFixPoint的半径
+//        mFixPointChangedRadius = calculateFixPointRadius(distanceOfPoints(mFingerPoint, mFixPoint));
+//        invalidate();
+//        return true;
+//    }
 
     private float calculateFixPointRadius(double distanceOfPoints) {
         return mFixPointInitRadius - (float) distanceOfPoints / 25f;//除数（20f）越大，代表半径随距离变化的程度越小
@@ -146,5 +150,25 @@ class DragBoomView extends View {
 
     public void setCaptureView(Bitmap bitmap) {
         this.mCaptureView = bitmap;
+    }
+
+    public void updatePosition(float rawX, float rawY) {
+        if (mFingerPoint == null) {
+            mFingerPoint = new PointF();
+        }
+        mFingerPoint.x = rawX;
+        mFingerPoint.y = rawY;
+        mFixPointChangedRadius = calculateFixPointRadius(distanceOfPoints(mFingerPoint, mFixPoint));
+        invalidate();
+    }
+
+    public void initOriginView(float fixPositionX, float fixPositionY) {
+        Log.e("TAG", "initOriginPosition: " + fixPositionX + " " + fixPositionY);
+        if (mFixPoint == null) {
+            mFixPoint = new PointF();
+        }
+        mFixPoint.x = fixPositionX;
+        mFixPoint.y = fixPositionY;
+        invalidate();
     }
 }
