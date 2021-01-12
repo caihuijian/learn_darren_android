@@ -43,7 +43,7 @@ class DragBoomViewTouchListener implements View.OnTouchListener {
                 mOriginView.getLocationOnScreen(location);
                 //3.1 遇到问题originView的位置不对，手指点的位置不对
                 //location是view左上角相对屏幕的位置，需要确保固定圆在mOriginView的中心就要加上view宽高的一半，同时还要减去图状态栏高度
-                mDragView.initPoints(location[0] + (mOriginView.getMeasuredWidth() >> 1), location[1] + (mOriginView.getMeasuredHeight() >> 1) - Utils.getStatusBarHeight(mContext));
+                mDragView.initPoints(location[0] + (mOriginView.getMeasuredWidth() / 2), location[1] + (mOriginView.getMeasuredHeight() / 2) - Utils.getStatusBarHeight(mContext));
 
                 Bitmap bitmap = Utils.getBitmapByView(mOriginView);
                 mDragView.setCaptureView(bitmap);

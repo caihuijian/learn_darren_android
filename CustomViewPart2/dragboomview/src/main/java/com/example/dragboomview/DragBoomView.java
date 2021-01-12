@@ -13,9 +13,7 @@ import android.graphics.Path;
 import android.graphics.PointF;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
-import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
@@ -23,11 +21,12 @@ import androidx.annotation.Nullable;
  * Created by Cai Huijian on 2021/1/10.
  */
 class DragBoomView extends View {
+    private static final String TAG = "DragBoomView";
     private PointF mFixPoint;
     private PointF mFingerPoint;
     private Paint mPaint;
     private float mFixPointInitRadius = 10;//固定圆初始半径
-    private float minFixPointRadius = 5;//固定圆最小半径 如果比这个更小 不进行绘制
+    private float mMinFixPointRadius = 5;//固定圆最小半径 如果比这个更小 不进行绘制
     private float mFixPointChangedRadius;//挪动手指后的固定圆半径
     private float mFingerPointRadius = 10;
     private DragBoomViewTouchListener mDragBoomViewTouchListener;
@@ -48,7 +47,7 @@ class DragBoomView extends View {
         initPaint();
         mFixPointInitRadius = Utils.dp2px(mFixPointInitRadius, context);
         mFingerPointRadius = Utils.dp2px(mFingerPointRadius, context);
-        minFixPointRadius = Utils.dp2px(minFixPointRadius, context);
+        mMinFixPointRadius = Utils.dp2px(mMinFixPointRadius, context);
     }
 
     public static void attachToView(View textView) {
@@ -69,7 +68,6 @@ class DragBoomView extends View {
         }
         //绘制固定圆
         if (isNeedShowBezier()) {//当手指离固定圆太远 不绘制固定圆
-
             canvas.drawCircle(mFixPoint.x, mFixPoint.y, mFixPointChangedRadius, mPaint);
             canvas.drawPath(getBezierPath(), mPaint);
         }
@@ -113,7 +111,8 @@ class DragBoomView extends View {
 //    }
 
     private float calculateFixPointRadius(double distanceOfPoints) {
-        return mFixPointInitRadius - (float) distanceOfPoints / 25f;//除数（20f）越大，代表半径随距离变化的程度越小
+        return mFixPointInitRadius - (float) distanceOfPoints / 20f;//除数（20f）越大，代表半径随距离变化的程度越小
+
     }
 
     private Path getBezierPath() {
@@ -177,7 +176,7 @@ class DragBoomView extends View {
     }
 
     private boolean isNeedShowBezier() {
-        return mFixPointChangedRadius > Utils.dp2px(minFixPointRadius, getContext());
+        return mFixPointChangedRadius > mMinFixPointRadius;
     }
 
     public void dealActionUp() {
