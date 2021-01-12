@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -14,6 +15,7 @@ import android.graphics.PointF;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.OvershootInterpolator;
 
 import androidx.annotation.Nullable;
 
@@ -188,16 +190,26 @@ class DragBoomView extends View {
     }
 
     private void playBackAnimate() {
-        ObjectAnimator translationX = ObjectAnimator.ofFloat(this, "translationX", mFingerPoint.x, mFixPoint.x);
-        ObjectAnimator translationY = ObjectAnimator.ofFloat(this, "translationY", mFingerPoint.y, mFixPoint.y);
-        AnimatorSet animatorSet = new AnimatorSet();
-        animatorSet.playTogether(translationX, translationY);
-        animatorSet.setDuration(1000 * 2);
-        animatorSet.start();
-        animatorSet.addListener(new AnimatorListenerAdapter() {
+        //回弹 动画
+        //ValueAnimator 值变化的动画  getAnimatedValue由0变化到1
+        ValueAnimator animator = ObjectAnimator.ofFloat(1);
+        animator.setDuration(250);
+        final PointF start = new PointF(mFingerPoint.x, mFingerPoint.y);
+        final PointF end = new PointF(mFixPoint.x, mFixPoint.y);
+        animator.addUpdateListener(animation -> {
+            float percent = (float) animation.getAnimatedValue();// 0 - 1
+            PointF pointF = Utils.getPointByPercent(start, end, percent);
+            // 用代码更新拖拽点
+            updatePosition(pointF.x, pointF.y);
+        });
+        // 设置一个差值器 在结束的时候有一个弹动效果
+        animator.setInterpolator(new OvershootInterpolator(3f));//3f表示晃动强度较大 数值越大效果越强
+        animator.start();
+        animator.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 if (mDragBoomViewTouchListener != null) {
+                    // 还要通知 TouchListener 移除当前View 然后显示静态的 View
                     mDragBoomViewTouchListener.reset();
                 }
             }

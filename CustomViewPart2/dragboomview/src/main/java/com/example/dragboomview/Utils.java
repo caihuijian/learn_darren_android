@@ -3,6 +3,7 @@ package com.example.dragboomview;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.PointF;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
@@ -22,27 +23,26 @@ class Utils {
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, context.getResources().getDisplayMetrics());
     }
 
-    //获取状态栏的高度
-    public static int getStatusBarHeight1(Context context) {
-        // 插件式换肤有讲到：怎么获取资源的-->类似反射 先获取资源id，根据id获取资源高度
-        Resources resources = context.getResources();
-        int statusBarHeightId = resources.getIdentifier("status_bar_height", "dimen", "android");
-        Log.e("TAG", statusBarHeightId + " -> " + resources.getDimensionPixelOffset(statusBarHeightId));
-        return resources.getDimensionPixelSize(statusBarHeightId);
-    }
-
-    /**
-     * 获取状态栏高度
-     *
-     * @return
-     */
-    public static float getStatusBarHeight(Context context) {
+    //获取状态栏高度
+    public static float getStatusBarHeight1(Context context) {
         //获取status_bar_height资源的ID
         int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
         if (resourceId > 0) {
-            //根据资源ID获取响应的尺寸值
             return context.getResources().getDimensionPixelSize(resourceId);
         }
+        //没有获取到 取0
         return 0;
+    }
+
+    //按照百分比在由point1 point2组成的线段上取点
+    public static PointF getPointByPercent(PointF point1, PointF point2, float percent) {
+        return new PointF(evaluateValue(percent, point1.x, point2.x), evaluateValue(
+                percent, point1.y, point2.y));
+    }
+
+    //Number是int float等基本数字类型的父类
+    public static float evaluateValue(float percent, Number start, Number end) {
+        return start.floatValue() + (end.floatValue() - start.floatValue())
+                * percent;
     }
 }
