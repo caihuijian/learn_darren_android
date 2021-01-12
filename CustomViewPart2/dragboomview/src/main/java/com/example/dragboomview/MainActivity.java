@@ -20,9 +20,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        TextView textView =  findViewById(R.id.textView);
-        DragBoomView.attachToView(textView);
-        //TODO 截图被放在了那一层？？？
-        //TODO DragBoomViewTouchListener 和DragBoomView 职责不清
+        TextView textView = findViewById(R.id.textView);
+        DragBoomView.attachToView(textView, view -> Toast.makeText(MainActivity.this, "原先的View被删除",
+                Toast.LENGTH_SHORT).show());
     }
 }

@@ -1,16 +1,16 @@
 package com.example.dragboomview;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
-import android.util.Log;
+import android.graphics.PointF;
+import android.graphics.drawable.AnimationDrawable;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 
 /**
  * Created by Cai Huijian on 2021/1/11.
@@ -20,10 +20,14 @@ class DragBoomViewTouchListener implements View.OnTouchListener {
     private WindowManager mWindowManager;
     private Context mContext;
     private View mOriginView;
-    private View mCaptureView;
     private WindowManager.LayoutParams mParams;
 
-    public DragBoomViewTouchListener(View mOriginView) {
+    // 爆炸帧动画
+    private FrameLayout mBombFrame;
+    private ImageView mBombImage;
+    private DragViewDisappearListener mDisappearListener;
+
+    public DragBoomViewTouchListener(View mOriginView, DragViewDisappearListener disappearListener) {
         this.mOriginView = mOriginView;
         this.mContext = mOriginView.getContext();
         mWindowManager = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
@@ -32,6 +36,13 @@ class DragBoomViewTouchListener implements View.OnTouchListener {
         mParams = new WindowManager.LayoutParams();
         // 背景要透明
         mParams.format = PixelFormat.TRANSPARENT;
+
+        //爆炸动画初始化
+        mBombFrame = new FrameLayout(mContext);
+        mBombImage = new ImageView(mContext);
+        mBombImage.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        mBombFrame.addView(mBombImage);
+        this.mDisappearListener = disappearListener;
     }
 
     @Override
@@ -55,7 +66,7 @@ class DragBoomViewTouchListener implements View.OnTouchListener {
                 mDragView.updatePosition(event.getRawX(), event.getRawY() - Utils.getStatusBarHeight(mContext));
                 break;
             case MotionEvent.ACTION_UP:
-                mDragView.dealActionUp();
+                mDragView.dealWithActionUp();
                 break;
         }
         return true;
@@ -66,5 +77,44 @@ class DragBoomViewTouchListener implements View.OnTouchListener {
         mWindowManager.removeView(mDragView);
         // 把原来的View显示
         mOriginView.setVisibility(View.VISIBLE);
+    }
+
+    //帧动画
+    public void dismiss(PointF pointF) {
+        // 移除截图的View
+        mWindowManager.removeView(mDragView);
+        // 要在 mWindowManager 添加一个爆炸动画
+        mWindowManager.addView(mBombFrame, mParams);
+        mBombImage.setBackgroundResource(R.drawable.anim_bubble_pop);
+
+        AnimationDrawable drawable = (AnimationDrawable) mBombImage.getBackground();
+        mBombImage.setX(pointF.x - drawable.getIntrinsicWidth() / 2);
+        mBombImage.setY(pointF.y - drawable.getIntrinsicHeight() / 2);
+
+        drawable.start();
+        // 等它执行完之后我要移除掉这个 爆炸动画也就是 mBombFrame
+        mBombImage.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mWindowManager.removeView(mBombFrame);
+                // 通知一下外面该消失
+                if (mDisappearListener != null) {
+                    mDisappearListener.viewDismiss(mOriginView);
+                }
+            }
+        }, getAnimationDrawableTime(drawable));
+    }
+
+    private long getAnimationDrawableTime(AnimationDrawable drawable) {
+        int numberOfFrames = drawable.getNumberOfFrames();
+        long time = 0;
+        for (int i = 0; i < numberOfFrames; i++) {
+            time += drawable.getDuration(i);
+        }
+        return time;
+    }
+
+    public interface DragViewDisappearListener {
+        void viewDismiss(View view);
     }
 }

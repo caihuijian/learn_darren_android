@@ -52,8 +52,8 @@ class DragBoomView extends View {
         mMinFixPointRadius = Utils.dp2px(mMinFixPointRadius, context);
     }
 
-    public static void attachToView(View textView) {
-        textView.setOnTouchListener(new DragBoomViewTouchListener(textView));
+    public static void attachToView(View textView, DragBoomViewTouchListener.DragViewDisappearListener disappearListener) {
+        textView.setOnTouchListener(new DragBoomViewTouchListener(textView, disappearListener));
     }
 
     private void initPaint() {
@@ -181,11 +181,14 @@ class DragBoomView extends View {
         return mFixPointChangedRadius > mMinFixPointRadius;
     }
 
-    public void dealActionUp() {
+    public void dealWithActionUp() {
         if (this.isNeedShowBezier()) { //4.1如果 抬起时距离不大，view回弹
             playBackAnimate();
         } else {//4.5如果View拖动很远 则触发消失的动作。将原先的View设置为Gone，隐藏拖动的截图，播放爆炸的帧动画，播放完毕释放资源
-
+            //播放帧动画
+            if (mDragBoomViewTouchListener != null) {
+                mDragBoomViewTouchListener.dismiss(mFingerPoint);
+            }
         }
     }
 

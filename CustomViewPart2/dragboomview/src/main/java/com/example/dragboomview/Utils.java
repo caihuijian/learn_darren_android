@@ -24,7 +24,7 @@ class Utils {
     }
 
     //获取状态栏高度
-    public static float getStatusBarHeight1(Context context) {
+    public static float getStatusBarHeight(Context context) {
         //获取status_bar_height资源的ID
         int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
         if (resourceId > 0) {
