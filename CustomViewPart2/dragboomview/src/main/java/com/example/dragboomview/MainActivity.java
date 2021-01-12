@@ -21,7 +21,21 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         TextView textView = findViewById(R.id.textView);
-        DragBoomView.attachToView(textView, view -> Toast.makeText(MainActivity.this, "原先的View被删除",
-                Toast.LENGTH_SHORT).show());
+        DragBoomView.attachToView(textView, view -> {
+            Toast.makeText(MainActivity.this, "原先的View被删除", Toast.LENGTH_SHORT).show();
+            view.setVisibility(View.GONE);
+        });
+
+        TextView textView2 = findViewById(R.id.textView2);
+        DragBoomView.attachToView(textView2, view -> {
+            Toast.makeText(MainActivity.this, "原先的View被删除", Toast.LENGTH_SHORT).show();
+            view.setVisibility(View.GONE);
+        });
+
+        TextView textView3 = findViewById(R.id.textView3);
+        DragBoomView.attachToView(textView3, view -> {
+            Toast.makeText(MainActivity.this, "原先的View被删除", Toast.LENGTH_SHORT).show();
+            view.setVisibility(View.GONE);
+        });
     }
 }
