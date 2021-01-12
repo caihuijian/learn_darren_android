@@ -49,7 +49,6 @@ class DragBoomViewTouchListener implements View.OnTouchListener {
     public boolean onTouch(View v, MotionEvent event) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                //2.2将创建的截图和DragView一起显示到界面
                 int[] location = new int[2];
                 mOriginView.getLocationOnScreen(location);
                 //3.1 遇到问题originView的位置不对，手指点的位置不对
@@ -62,10 +61,11 @@ class DragBoomViewTouchListener implements View.OnTouchListener {
                 //2.按下的时候将原先的View隐藏
                 mOriginView.setVisibility(View.INVISIBLE);
             case MotionEvent.ACTION_MOVE://3.移动的时候 不停绘制贝塞尔曲线以及截图
-
+                //这里传的点和down的点不统一 我认为不太好
                 mDragView.updatePosition(event.getRawX(), event.getRawY() - Utils.getStatusBarHeight(mContext));
                 break;
             case MotionEvent.ACTION_UP:
+                //4.对手指抬起做监听
                 mDragView.dealWithActionUp();
                 break;
         }

@@ -77,7 +77,7 @@ class DragBoomView extends View {
         //绘制跟随手指的圆
         canvas.drawCircle(mFingerPoint.x, mFingerPoint.y, mFingerPointRadius, mPaint);
 
-        //绘制截图
+        //2.3将创建的截图和DragView一起显示到界面（在onDraw绘制）
         if (mCaptureView != null) {
             canvas.drawBitmap(mCaptureView, mFingerPoint.x - mCaptureView.getWidth() / 2, mFingerPoint.y - mCaptureView.getHeight() / 2, mPaint);
         }
@@ -171,6 +171,7 @@ class DragBoomView extends View {
         invalidate();
     }
 
+    //2.2将创建的截图保存到DragView并让其在onDraw绘制 注意保存截图的显示位置
     public void initPoints(float pointX, float pointY) {
         mFixPoint = new PointF(pointX, pointY);
         mFingerPoint = new PointF(pointX, pointY);
@@ -185,15 +186,15 @@ class DragBoomView extends View {
         if (this.isNeedShowBezier()) { //4.1如果 抬起时距离不大，view回弹
             playBackAnimate();
         } else {//4.5如果View拖动很远 则触发消失的动作。将原先的View设置为Gone，隐藏拖动的截图，播放爆炸的帧动画，播放完毕释放资源
-            //播放帧动画
             if (mDragBoomViewTouchListener != null) {
+                //4.5如果View拖动很远 则触发消失的动作。将原先的View设置为Gone，隐藏拖动的截图，播放爆炸的帧动画，播放完毕释放资源
                 mDragBoomViewTouchListener.dismiss(mFingerPoint);
             }
         }
     }
 
     private void playBackAnimate() {
-        //回弹 动画
+        //4.2计算回弹轨迹，添加回弹动画
         //ValueAnimator 值变化的动画  getAnimatedValue由0变化到1
         ValueAnimator animator = ObjectAnimator.ofFloat(1);
         animator.setDuration(250);
@@ -205,6 +206,7 @@ class DragBoomView extends View {
             // 用代码更新拖拽点
             updatePosition(pointF.x, pointF.y);
         });
+        // 4.3利用插值器，回弹到原始位置的时候添加抖动效果
         // 设置一个差值器 在结束的时候有一个弹动效果
         animator.setInterpolator(new OvershootInterpolator(3f));//3f表示晃动强度较大 数值越大效果越强
         animator.start();
@@ -212,6 +214,7 @@ class DragBoomView extends View {
             @Override
             public void onAnimationEnd(Animator animation) {
                 if (mDragBoomViewTouchListener != null) {
+                    //4.4去除创建的截图并显示出原先的View
                     // 还要通知 TouchListener 移除当前View 然后显示静态的 View
                     mDragBoomViewTouchListener.reset();
                 }
