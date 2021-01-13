@@ -16,6 +16,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void like(View view) {
-        mLikesLayout.addLike();
+        mLikesLayout.addLikes();
     }
 }
