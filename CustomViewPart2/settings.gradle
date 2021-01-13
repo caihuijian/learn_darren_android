@@ -1,3 +1,4 @@
+include ':rotateloadingview'
 include ':likesview'
 include ':dragboomview'
 include ':bezierview'
