@@ -8,7 +8,8 @@ import android.graphics.PointF;
  * 用于产生三阶贝塞尔曲线
  */
 class BezierTypeEvaluator implements TypeEvaluator<PointF> {
-    private PointF mControlPoint1, mControlPoint2;
+    private final PointF mControlPoint1;
+    private final PointF mControlPoint2;
 
 
     public BezierTypeEvaluator(PointF controlPoint1, PointF controlPoint2) {

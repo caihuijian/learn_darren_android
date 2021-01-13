@@ -9,7 +9,6 @@ import android.content.Context;
 import android.graphics.PointF;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AccelerateInterpolator;
@@ -30,17 +29,16 @@ class LikesLayout extends RelativeLayout {
     private static final String TAG = "LikesLayout";
 
     //星星的图片宽高
-    private final int mDrawableWidth;
-    private final int mDrawableHeight;
+    private int mDrawableWidth = 0;
+    private int mDrawableHeight = 0;
     // 用于产生随机数
-    private Random mRandom;
+    private final Random mRandom;
     // 存储图片资源id
-    private int[] mImageResId;
+    private final int[] mImageResId;
     //整个layout宽高
     private int mWidth;
     private int mHeight;
-
-    private Interpolator[] mInterpolator;
+    private final Interpolator[] mInterpolator;
 
     public LikesLayout(Context context) {
         this(context, null);
@@ -57,8 +55,10 @@ class LikesLayout extends RelativeLayout {
         mImageResId = new int[]{R.drawable.star_blue, R.drawable.star_green, R.drawable.star_red, R.drawable.star_blue_bright, R.drawable.star_orange_light};
         Drawable drawable = ContextCompat.getDrawable(context, R.drawable.star_blue);
         //假设所有星星的大小相等（如果不等要分别计算）
-        mDrawableWidth = drawable.getIntrinsicWidth();
-        mDrawableHeight = drawable.getIntrinsicHeight();
+        if (drawable != null) {
+            mDrawableWidth = drawable.getIntrinsicWidth();
+            mDrawableHeight = drawable.getIntrinsicHeight();
+        }
         mInterpolator = new Interpolator[]{new AccelerateDecelerateInterpolator(), new AccelerateInterpolator(),
                 new DecelerateInterpolator(), new LinearInterpolator()};
     }
@@ -134,15 +134,15 @@ class LikesLayout extends RelativeLayout {
         PointF endPoint = new PointF(mRandom.nextInt(mWidth - mDrawableWidth), 0);
         BezierTypeEvaluator evaluator = new BezierTypeEvaluator(controlPoint1, controlPoint2);
         ValueAnimator bezierAnimator = ObjectAnimator.ofObject(evaluator, statPoint, endPoint);
-        // 加一些随机的差值器
+        // 4.1加一些随机的插值器
         bezierAnimator.setInterpolator(mInterpolator[mRandom.nextInt(mInterpolator.length)]);
         bezierAnimator.addUpdateListener(animation -> {
             PointF pointF = (PointF) animation.getAnimatedValue();
             likeIv.setX(pointF.x);
             likeIv.setY(pointF.y);
-            // 透明度变化
+            // 3.添加透明度变化动画，飘到顶部时颜色最淡
             float t = animation.getAnimatedFraction();
-            likeIv.setAlpha(1 - t);//最小透明度0.2f
+            likeIv.setAlpha(1 - t);
         });
         bezierAnimator.setDuration(3000);
         return bezierAnimator;
