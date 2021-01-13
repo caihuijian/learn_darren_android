@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.animation.TypeEvaluator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -195,14 +196,15 @@ class DragBoomView extends View {
 
     private void playBackAnimate() {
         //4.2计算回弹轨迹，添加回弹动画
-        //ValueAnimator 值变化的动画  getAnimatedValue由0变化到1
-        ValueAnimator animator = ObjectAnimator.ofFloat(1);
-        animator.setDuration(250);
         final PointF start = new PointF(mFingerPoint.x, mFingerPoint.y);
         final PointF end = new PointF(mFixPoint.x, mFixPoint.y);
+        BezierTypeEvaluator evaluator = new BezierTypeEvaluator();
+        ValueAnimator animator = ObjectAnimator.ofObject(evaluator, start, end);
+        animator.setDuration(250);
         animator.addUpdateListener(animation -> {
-            float percent = (float) animation.getAnimatedValue();// 0 - 1
-            PointF pointF = Utils.getPointByPercent(start, end, percent);
+//            float percent = (float) animation.getAnimatedValue();// 0 - 1
+//            PointF pointF = Utils.getPointByPercent(start, end, percent);
+            PointF pointF = (PointF) animation.getAnimatedValue();
             // 用代码更新拖拽点
             updatePosition(pointF.x, pointF.y);
         });
@@ -220,5 +222,14 @@ class DragBoomView extends View {
                 }
             }
         });
+    }
+
+    static class BezierTypeEvaluator implements TypeEvaluator<PointF> {
+        @Override
+        public PointF evaluate(float fraction, PointF startValue, PointF endValue) {
+            float pointX = startValue.x + (endValue.x - startValue.x) * fraction;
+            float pointY = startValue.y + (endValue.y - startValue.y) * fraction;
+            return new PointF(pointX, pointY);
+        }
     }
 }

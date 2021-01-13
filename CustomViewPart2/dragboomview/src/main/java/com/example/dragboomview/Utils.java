@@ -34,15 +34,15 @@ class Utils {
         return 0;
     }
 
-    //按照百分比在由point1 point2组成的线段上取点
-    public static PointF getPointByPercent(PointF point1, PointF point2, float percent) {
-        return new PointF(evaluateValue(percent, point1.x, point2.x), evaluateValue(
-                percent, point1.y, point2.y));
-    }
-
-    //Number是int float等基本数字类型的父类
-    public static float evaluateValue(float percent, Number start, Number end) {
-        return start.floatValue() + (end.floatValue() - start.floatValue())
-                * percent;
-    }
+//    //按照百分比在由point1 point2组成的线段上取点
+//    public static PointF getPointByPercent(PointF point1, PointF point2, float percent) {
+//        return new PointF(evaluateValue(percent, point1.x, point2.x), evaluateValue(
+//                percent, point1.y, point2.y));
+//    }
+//
+//    //Number是int float等基本数字类型的父类
+//    public static float evaluateValue(float percent, Number start, Number end) {
+//        return start.floatValue() + (end.floatValue() - start.floatValue())
+//                * percent;
+//    }
 }
