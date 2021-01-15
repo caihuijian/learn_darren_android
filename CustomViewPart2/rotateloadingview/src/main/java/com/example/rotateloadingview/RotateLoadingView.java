@@ -17,9 +17,15 @@ import androidx.annotation.Nullable;
 
 /**
  * Created by hjcai on 2021/1/14.
+ * RotateLoadingView 存在三种动画状态 MergeAnimationStatus ExtendAnimationStatus RotateAnimationStatus
+ * 三种动画状态的控制状态如下
+ * <p>
+ * 创建RotateLoadingView之后 RotateLoadingView自动进入RotateAnimationStatus状态 该状态要由外部打破 否则持续执行
+ * 当外部加载完毕 调用loadComplete方法，RotateLoadingView取消RotateAnimationStatus状态  进入MergeAnimationStatus状态
+ * MergeAnimationStatus动画执行完毕进入ExtendAnimationStatus状态 ExtendAnimationStatus执行完毕 将当前RotateLoadingView隐藏
  */
 class RotateLoadingView extends View {
-    //动画时长
+    // 动画时长
     private static final int ANIMATION_DURATION = 1500;
     // 当前动画状态
     AnimateStatus mCurrentAnimateStatus;
@@ -33,7 +39,6 @@ class RotateLoadingView extends View {
     float mPerAngle;
     // 旋转经过的角度 结合每个圆对应的角度来表示旋转时各个小圆的位置
     float mRotatedAngle = 0;
-
     // view的宽高
     int mViewHeight, mViewWidth;
     // 大圆的半径
@@ -80,14 +85,17 @@ class RotateLoadingView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         if (mCurrentAnimateStatus == null) {
+            // 初始状态为RotateAnimationStatus
             mCurrentAnimateStatus = new RotateAnimationStatus();
         }
+        // 各个状态进行各自的绘制
         mCurrentAnimateStatus.draw(canvas);
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        // 初始化依赖获取view宽高的变量
         mViewHeight = MeasureSpec.getSize(heightMeasureSpec);
         mViewWidth = MeasureSpec.getSize(widthMeasureSpec);
         mBigCircleRadius = Math.min(mViewHeight, mViewWidth) / 4;
@@ -103,9 +111,11 @@ class RotateLoadingView extends View {
             return;
         }
         mCurrentAnimateStatus.cancel();
+        // 从RotateAnimationStatus进入MergeAnimationStatus
         mCurrentAnimateStatus = new MergeAnimationStatus();
     }
 
+    //复用方法 RotateAnimationStatus和MergeAnimationStatus可以公用该方法
     private void drawSmallCircle(Canvas canvas) {
         canvas.drawColor(Color.WHITE);
         for (int i = 0; i < mColors.length; i++) {
@@ -115,6 +125,7 @@ class RotateLoadingView extends View {
         }
     }
 
+    //旋转动画 本质是ValueAnimator改变mRotatedAngle 旋转角 然后在onDraw方法不停绘制
     class RotateAnimationStatus extends AnimateStatus {
 
         ValueAnimator rotateAnimator;
@@ -156,6 +167,7 @@ class RotateLoadingView extends View {
 
     }
 
+    //聚合动画 本质是ValueAnimator改变mBigCircleRadius 大圆半径 然后在onDraw方法不停绘制
     class MergeAnimationStatus extends AnimateStatus {
         private final ValueAnimator mValueAnimator;
 
@@ -175,7 +187,7 @@ class RotateLoadingView extends View {
             mValueAnimator.addListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    mCurrentAnimateStatus = new ExtendAnimationStatus();
+                    mCurrentAnimateStatus = new ExtendAnimationStatus();//从MergeAnimationStatus进入ExtendAnimationStatus
                     Log.e("TAG", "MergeAnimationStatus: ");
                 }
             });
@@ -203,11 +215,11 @@ class RotateLoadingView extends View {
         }
     }
 
+    //扩散动画 本质是利用mPaint绘制空心圆 ValueAnimator改变画笔的粗细和半径 然后在onDraw方法不停绘制
     class ExtendAnimationStatus extends AnimateStatus {
-        private ValueAnimator mAnimator;
+        private final ValueAnimator mAnimator;
 
         public ExtendAnimationStatus() {
-
             mAnimator = ValueAnimator.ofFloat(0, (float) Math.sqrt(mCenterX * mCenterX + mCenterY * mCenterY));//透明圆的半径从0到View对角线的一半
             mAnimator.setDuration(ANIMATION_DURATION);
             mPaint.setStyle(Paint.Style.STROKE);
@@ -219,6 +231,7 @@ class RotateLoadingView extends View {
             mAnimator.addListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation, boolean isReverse) {
+                    //最后的动画执行完毕 释放资源
                     mCurrentAnimateStatus = null;
                     RotateLoadingView.this.setVisibility(View.GONE);
                     Log.e("TAG", "ExtendAnimationStatus: ");
